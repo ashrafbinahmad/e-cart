@@ -5,6 +5,10 @@
 // import { Review } from 'src/reviews/entities/review.entity';
 // import { Seller } from 'src/sellers/entities/seller.entity';
 
+import { Brand } from "./brand.entity";
+import { ProductCategory } from "./product-category.entity";
+import { Seller } from "./seller.entity";
+
 export class Product {
   id: number;
   name: string;
@@ -19,8 +23,10 @@ export class Product {
   image_3_url?: string;
   // brand: Brand;
   brandId: number;
+  brand?: Brand;
   // product_category: ProductCategory;
   product_categoryId: number;
+  product_category?: ProductCategory;
   // reviews: Review[];
   // cart_items: CartItem[];
   // orders: Order[];
@@ -29,4 +35,5 @@ export class Product {
   stock: number;
   // Seller: Seller;
   sellerId: number;
+  seller?: Seller;
 }

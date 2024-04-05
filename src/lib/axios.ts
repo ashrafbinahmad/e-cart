@@ -1,8 +1,10 @@
 "use client";
 import axios from "axios";
 
+let repeated = false;
+
 const api = axios.create({
-  baseURL: "https://api.example.com", // Replace with your API base URL
+  baseURL: process.env.API_HOST, // Replace with your API base URL
 });
 
 // Add an interceptor to set the authorization header
@@ -22,30 +24,31 @@ api.interceptors.response.use(
 
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+      repeated = true
 
       const refreshToken = localStorage.getItem("refreshToken");
       if (refreshToken) {
         try {
-          // Send a post request to refresh tokens
-          const response = await axios.post("/refresh", { refreshToken });
-
-          // Update the access token in local storage
-          localStorage.setItem("accessToken", response.data.accessToken);
-
-          // Retry the original request with the new access token
+          const response = await axios.post(`${api.defaults.baseURL}/auth/refresh-tokens`, { refresh_token: refreshToken });
+          console.log({tokens: response.data})
+          localStorage.setItem("accessToken", response.data.access_token);
+          localStorage.setItem("accessToken", response.data.access_token);
+          // set the authorization header and retry the original request
+          api.defaults.headers.common.Authorization = `Bearer ${response.data.access_token}`;
           return api(originalRequest);
         } catch (refreshError) {
-          // Handle refresh token error
-          console.error("Failed to refresh tokens:", refreshError);
         }
       }
-
-      // go to login page
-      window.location.href = "/login";
+      if(!repeated) { 
+        
+        window.location.href = "/login";
+      }
     }
 
     return Promise.reject(error);
   }
 );
+
+
 
 export default api;
